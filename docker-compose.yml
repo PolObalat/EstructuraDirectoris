@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  apache-php:
+      image: php:8.1-apache
+      links:
+          - 'mariadb:db'
+      ports:
+          - 83:80
+      build: .
+      volumes:
+          - "./html:/var/www/html"        
+  
+  mariadb:
+      image: mariadb:10.5.2
+      volumes: 
+          - "./dump/proves.sql:/docker-entrypoint-initdb.d/dump.sql"
+      environment:
+          TZ: "Europe/Madrid"
+          MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+          MYSQL_ROOT_PASSWORD: 'rootpsw'
+          MYSQL_USER: 'r00t'
+          MYSQL_PASSWORD: 'r00t'
+          MYSQL_DATABASE: 'proves'
+
+  phpmyadmin:
+      image: phpmyadmin
+      links: 
+          - 'mariadb:db'  
+      ports:
+          - 8084:80
+  ubuntu:
+    image: ubuntu:latest
+    volumes:
+      - ./dump:/home
+      - ./script.sh:/script.sh
+    command: sh script.sh
+    environment:
+      - name=value
+
